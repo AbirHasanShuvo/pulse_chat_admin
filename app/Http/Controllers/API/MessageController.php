@@ -36,10 +36,17 @@ class MessageController extends Controller
     }
 
     public function getMessages($id){
-        return $id;
+        $user = auth()->user();
+
+        $messages = Message::where(function($query) use($user, $id) {
+            $query->where('sender_id', $user->id)->where('receiver_id', $id);
+        })->orWhere(function($query) use ($user, $id){
+             $query->where('sender_id', $id)->where('receiver_id',$user->id );
+        })->get();
+
+        return response()->json($messages);
     }
 
-  
 }
 
 
